@@ -17,7 +17,6 @@ export async function getOpenAICompletion({ conversation }: { conversation: IMes
   });
 
   const data: IResponseData = await response.json();
-  console.log(data);
   const assistant = data.choices?.filter((choice) => choice.message.role === 'assistant').map((choice) => choice.message.content).join('\n');
   return assistant
 }

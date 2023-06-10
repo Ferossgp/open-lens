@@ -40,7 +40,7 @@ const systemMessageTemplate = (users: UserResponse[]): IMessage => {
   };
 }
 
-const MAX = 20
+const MAX = 100
 
 export default async function handler(req: NextRequest) {
   const { searchParams } = new URL(req.url)
