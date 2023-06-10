@@ -8,12 +8,7 @@ query Profile($request: SingleProfileQueryRequest!) {
     ownedBy
     name
     bio
-    metadata
     followNftAddress
-    attributes {
-      key
-      value
-    }
     stats {
       totalFollowers
       totalFollowing
@@ -24,3 +19,17 @@ query Profile($request: SingleProfileQueryRequest!) {
     }
   }
 }`
+
+export const FETCH_HANDLE_BY_ADDRESS = gql`
+query Profiles($request: ProfileQueryRequest!) {
+  profiles(request: $request) {
+    items {
+      handle
+    }
+    pageInfo {
+      prev
+      next
+    }
+  }
+}
+`

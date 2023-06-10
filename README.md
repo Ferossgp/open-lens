@@ -16,15 +16,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Env Vars
 
-Create a `.env` file and set teh following ENV vars:
+Create a `.env` file and set the OPENAI_KEY and vercel postgres keys.
 
-```
-OPENAI_KEY=<Open AI Key>
-REDIS_TOKEN=<Upstash Redis Token>
-```
+## Process new user
 
-## Deploy on Vercel
+To add a new user profile into dataset call the following url with GET method:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+`http://localhost:3000/api/consume?handle=LENS_HANDLE`

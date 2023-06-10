@@ -5,6 +5,7 @@ import { FormEventHandler, useState } from 'react'
 import { LucideLoader } from 'lucide-react'
 
 const EXAMPLE_PROMPTS = [
+  "Folks who posted about ETH Prague",
   "Who to follow to get rich 🤑",
   "Whos the most degen on lens?",
   "Looking for people to colaborate in Music NFTs",
