@@ -5,6 +5,7 @@ import { NextRequest } from "next/server";
 import { FETCH_PROFILE_PUBLICATIONS } from "@/queries/ProfilePublications";
 import { getOpenAICompletion } from "@/lib/ai";
 import { sql } from "@vercel/postgres";
+import { isMemeHolder } from "@/lib/memeBalances";
 
 type Posts = {
   publications: {
@@ -16,7 +17,7 @@ type Posts = {
   }
 }
 
-const systemMessageTemplate = (profile: Profile, posts: Posts): IMessage => {
+const systemMessageTemplate = (profile: Profile, posts: Posts, memecoins: boolean): IMessage => {
   const messages = posts.publications.items.map((publication: any) => {
     return publication.metadata.content
   })
@@ -33,7 +34,8 @@ const systemMessageTemplate = (profile: Profile, posts: Posts): IMessage => {
             1. Detect patterns in the user's query and response with the most relevant interests.
             2. Here is the JSON containing user profile: ${JSON.stringify(profile.profile)}
             3. Do not include their profile stats in the response.
-            4. Here is a JSON containing a list of posts from a user separated by "|":
+            4. ${memecoins ? 'User is a meme coin holder (degen)' : 'User is not a meme holder'}
+            5. Here is a JSON containing a list of posts from a user separated by "|":
             ${JSON.stringify(messages).substring(0, 10000)}
             `,
   }
@@ -60,9 +62,13 @@ export const config = {
 
 export async function processHandle(handle: string, attendee?: boolean, long?: boolean): Promise<string> {
   const profile = await fetchProfile(handle);
-  const publications = await fetchLatestPosts(profile.profile.id)
+  const [publications, memecoins] = await Promise.all([
+    fetchLatestPosts(profile.profile.id),
+    isMemeHolder(profile.profile.ownedBy),
+  ]);
+
   const messages = [
-    systemMessageTemplate(profile, publications),
+    systemMessageTemplate(profile, publications, memecoins),
 
     long ?
       {

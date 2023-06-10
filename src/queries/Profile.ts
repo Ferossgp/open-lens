@@ -6,6 +6,7 @@ query Profile($request: SingleProfileQueryRequest!) {
     id
     handle
     name
+    ownedBy
     bio
     stats {
       totalFollowers

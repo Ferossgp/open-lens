@@ -1,9 +1,9 @@
-async function isMemeHolder(address: string): Promise<boolean> {
-    const pr_t = "https://rpc.eu-north-1.gateway.fm/v4/ethereum/non-archival/mainnet"
-    const pr = new ethers.providers.JsonRpcProvider(pr_t);
-    const memeContrats = [
-    "0x6982508145454Ce325dDbE47a25d4ec3d2311933", 
-    "0xAC57De9C1A09FeC648E93EB98875B212DB0d460B", 
+import { ethers, JsonRpcProvider } from "ethers";
+
+const pr = new JsonRpcProvider(process.env.GATEWAY_MAINNET);
+const memeContrats = [
+    "0x6982508145454Ce325dDbE47a25d4ec3d2311933",
+    "0xAC57De9C1A09FeC648E93EB98875B212DB0d460B",
     "0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E",
     "0xc5fB36dd2fb59d3B98dEfF88425a3F425Ee469eD",
     "0x27C70Cd1946795B66be9d954418546998b546634",
@@ -19,19 +19,21 @@ async function isMemeHolder(address: string): Promise<boolean> {
     "0xafcdd4f666c84fed1d8bd825aa762e3714f652c9",
     "0x9813037ee2218799597d83d4a5b6f3b6778218d9",
     "0x5026f006b85729a8b14553fae6af249ad16c9aab",
-    ]
+]
 
-    for (let i = 0; i < memeContrats.length; i++) {
-    const c = new ethers.Contract(memeContrats[i], [
+// ToDO: use multicall
+const memeInstace = memeContrats.map((c) => {
+    return new ethers.Contract(c, [
         "function balanceOf(address) view returns (uint)",
     ], pr);
+})
 
+export async function isMemeHolder(address: string): Promise<boolean> {
+    const balances = await Promise.all(memeInstace.map((c) => {
+        return c.balanceOf(address);
+    }))
 
-    const balance = await c.balanceOf(address);
-    if (balance > 0) {  
-        return true;
-    }
-    }
-
-    return false;
+    return balances.some((b) => {
+        return b > 0
+    })
 }

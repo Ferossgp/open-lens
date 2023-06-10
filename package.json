@@ -20,6 +20,7 @@
     "clsx": "^1.2.1",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
+    "ethers": "^6.5.1",
     "graphql": "^16.6.0",
     "graphql-request": "^6.1.0",
     "lucide-react": "^0.241.0",
