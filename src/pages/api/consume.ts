@@ -31,8 +31,8 @@ const systemMessageTemplate = (profile: Profile, posts: Posts): IMessage => {
 
             Besides, Here are some requirements:
             1. Detect patterns in the user's query and response with the most relevant interests.
-            2. If the user ask many times, you should generate the interests based on the previous context.
-            3. Here is the JSON containing user profile: ${JSON.stringify(profile.profile)}
+            2. Here is the JSON containing user profile: ${JSON.stringify(profile.profile)}
+            3. Do not include their profile stats in the response.
             4. Here is a JSON containing a list of posts from a user separated by "|":
             ${JSON.stringify(messages).substring(0, 10000)}
             `,
@@ -58,30 +58,41 @@ export const config = {
   runtime: 'edge',
 }
 
-export async function processHandle(handle: string, attendee?: boolean) {
+export async function processHandle(handle: string, attendee?: boolean, long?: boolean): Promise<string> {
   const profile = await fetchProfile(handle);
   const publications = await fetchLatestPosts(profile.profile.id)
   const messages = [
     systemMessageTemplate(profile, publications),
-    {
-      role: "user",
-      content: "give a short description of the user, and a list of their interests. Keep it as short and concise as possible."
-    },
+
+    long ?
+      {
+        role: "user",
+        content: "Give a breif description of user profile, and list their interests"
+      }
+      :
+      {
+        role: "user",
+        content: "In one phrase give a description in up to 10 words of the user, and a list of their interests. Keep it under 50 tokens"
+      },
   ];
 
   const { rows: users } = await sql`SELECT * from users where handle = ${handle.toLowerCase()} limit 1;`;
 
-  // Cache hit
   if (users.length > 0) {
-    return users[0].description;
+    if (long && users[0].long_description != null)
+      return users[0].long_description;
+    else if (!long && users[0].description != null)
+      return users[0].description;
   }
 
   const resp = await getOpenAICompletion({
     conversation: messages,
   });
 
-
-  await sql`INSERT INTO users (handle, description, attendee) VALUES (${handle.toLowerCase()}, ${resp}, ${!!attendee}) ON CONFLICT (handle) DO UPDATE SET description = excluded.description;`
+  if (long)
+    await sql`INSERT INTO users (handle, long_description, attendee) VALUES (${handle.toLowerCase()}, ${resp}, ${attendee}) ON CONFLICT (handle) DO UPDATE SET long_description = excluded.long_description;`
+  else
+    await sql`INSERT INTO users (handle, description, attendee) VALUES (${handle.toLowerCase()}, ${resp}, ${attendee}) ON CONFLICT (handle) DO UPDATE SET description = excluded.description;`
 
   return resp
 }

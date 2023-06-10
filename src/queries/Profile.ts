@@ -5,10 +5,8 @@ query Profile($request: SingleProfileQueryRequest!) {
   profile(request: $request) {
     id
     handle
-    ownedBy
     name
     bio
-    followNftAddress
     stats {
       totalFollowers
       totalFollowing

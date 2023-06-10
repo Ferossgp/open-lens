@@ -1,13 +1,13 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FormEventHandler, use, useCallback, useMemo, useState } from "react";
+import { FormEventHandler, useCallback, useState } from "react";
 import { LucideLoader } from "lucide-react";
 import useSWR, { Fetcher } from "swr";
 
 const EXAMPLE_PROMPTS = [
   "Folks who posted about ETH Prague",
-  "Who to follow to get rich 🤑",
+  "Who to follow to be on top of DeFi 🤑",
   "Whos the most degen on lens?",
   "Looking for people to colaborate in Music NFTs",
 ];

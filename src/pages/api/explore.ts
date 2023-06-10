@@ -15,14 +15,17 @@ const systemMessageTemplate = (users: UserResponse[]): IMessage => {
       .replace('User: ', '')
       .replace('Description: ', '')
       .replace('Interests: ', '')
+      .replaceAll(/((\d+) follow)\w+/g, '')
+      .replaceAll(/((\d+) comm)\w+/g, '')
+      .replaceAll(/((\d+) mirr)\w+/g, '')
       .replaceAll('#', '')
       .split(' ')
 
-    const interm = words.length > 50 ? words.slice(0, 50).join(' ') : words.join(' ')
+    const interm = words.length > 30 ? words.slice(0, 30).join(' ') : words.join(' ')
 
     const description = interm
     return `${user.handle}: ${description}, `
-  }).join('\n')
+  }).join('|')
 
   return {
     role: "system",
@@ -30,17 +33,19 @@ const systemMessageTemplate = (users: UserResponse[]): IMessage => {
 
             No matter what the user ask, You should find one profile user should follow based on the asked query.
             
-            You should always return their lens handle in the response. The handle is delimited by ":" from the user description.
+            You should always return their lens name in the response. 
+            The lens name and description are delimited by ":".
+            Users are delimited by "|".
 
             Domain specific terminology:
-            1. Degen - a person who is interested in high risk high reward investments
+            1. Degen - an active trader, meme coins, risky investments
 
-            Here is the list of all available profiles: ${messages}
+            All available profiles: ${messages}
             `,
   };
 }
 
-const MAX = 100
+const MAX = 80
 
 export default async function handler(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -61,7 +66,8 @@ export default async function handler(req: NextRequest) {
   }
 
   console.log('Processing user query:', query)
-  const { rows: users } = await sql`SELECT * from users limit ${MAX}`;
+  // Select random users
+  const { rows: users } = await sql`SELECT * from users order by random() limit ${MAX}`;
 
   console.log(`Processing top ${users.length} users on Lens`)
 

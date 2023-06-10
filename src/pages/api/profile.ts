@@ -30,7 +30,7 @@ export default async function handler(req: NextRequest) {
     request: { handle: slug },
   });
 
-  const description = await processHandle(slug, true);
+  const description = await processHandle(slug, true, true);
 
   return new Response(
     JSON.stringify({
