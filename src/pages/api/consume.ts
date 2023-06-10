@@ -61,6 +61,15 @@ export const config = {
 }
 
 export async function processHandle(handle: string, attendee?: boolean, long?: boolean): Promise<string> {
+  const { rows: users } = await sql`SELECT * from users where handle = ${handle.toLowerCase()} limit 1;`;
+
+  if (users.length > 0) {
+    if (long && users[0].long_description != null)
+      return users[0].long_description;
+    else if (!long && users[0].description != null)
+      return users[0].description;
+  }
+
   const profile = await fetchProfile(handle);
   const [publications, memecoins] = await Promise.all([
     fetchLatestPosts(profile.profile.id),
@@ -81,15 +90,6 @@ export async function processHandle(handle: string, attendee?: boolean, long?: b
         content: "In one phrase give a description in up to 10 words of the user, and a list of their interests. Keep it under 50 tokens"
       },
   ];
-
-  const { rows: users } = await sql`SELECT * from users where handle = ${handle.toLowerCase()} limit 1;`;
-
-  if (users.length > 0) {
-    if (long && users[0].long_description != null)
-      return users[0].long_description;
-    else if (!long && users[0].description != null)
-      return users[0].description;
-  }
 
   const resp = await getOpenAICompletion({
     conversation: messages,
