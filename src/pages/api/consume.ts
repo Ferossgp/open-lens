@@ -1,4 +1,4 @@
-import { FETCH_PROFILE } from "@/queries/Profile";
+import { FETCH_PROFILE, Profile } from "@/queries/Profile";
 import { IMessage } from "./types";
 import client from "@/lib/graphql";
 import { NextRequest } from "next/server";
@@ -13,17 +13,6 @@ type Posts = {
         content: string;
       }
     }[]
-  }
-}
-
-type Profile = {
-  profile: {
-    id: string,
-    ownedBy: string,
-    name: string,
-    followNftAddress: string
-    bio: string,
-    stats: Record<string, number>,
   }
 }
 
@@ -69,7 +58,7 @@ export const config = {
   runtime: 'edge',
 }
 
-export async function processHandle(handle: string) {
+export async function processHandle(handle: string, attendee?: boolean) {
   const profile = await fetchProfile(handle);
   const publications = await fetchLatestPosts(profile.profile.id)
   const messages = [
@@ -80,12 +69,19 @@ export async function processHandle(handle: string) {
     },
   ];
 
+  const { rows: users } = await sql`SELECT * from users where handle = ${handle.toLowerCase()} limit 1;`;
+
+  // Cache hit
+  if (users.length > 0) {
+    return users[0].description;
+  }
+
   const resp = await getOpenAICompletion({
     conversation: messages,
   });
 
 
-  await sql`INSERT INTO users (handle, description) VALUES (${handle}, ${resp}) ON CONFLICT (handle) DO UPDATE SET description = excluded.description;`
+  await sql`INSERT INTO users (handle, description, attendee) VALUES (${handle.toLowerCase()}, ${resp}, ${!!attendee}) ON CONFLICT (handle) DO UPDATE SET description = excluded.description;`
 
   return resp
 }

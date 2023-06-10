@@ -39,52 +39,44 @@ export default function Home() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen pt-24 px-4">
-      <header className="flex flex-row justify-center items-center h-24 w-full">
-        <h1 className="text-3xl font-bold">🤲 🌿</h1>
-      </header>
-      <div className="flex flex-1 h-full flex-col items-center gap-8">
+    <div className="flex flex-1 h-full flex-col items-center gap-8">
+      <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-2/4">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <h3 className="text-lg font-semibold leading-none tracking-tight">Explore Lens</h3>
+          <p className="text-sm text-muted-foreground">Find people that match your interest the most!</p>
+        </div>
+        <form onSubmit={handleSubmit} className='p-6 flex flex-col gap-4 pt-0'>
+          <div className="flex flex-row gap-4">
+            <Input
+              placeholder="Looking to know..."
+              value={inputValue}
+              onChange={(event) => setInputValue(event.target.value)}
+              name='query'
+            />
+            <Button size="lg" className='gap-2 flex flex-row' disabled={isLoading}>
+              {isLoading && <LucideLoader size={24} className="animate-spin" />}
+              Explore
+            </Button>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <p className="text-sm">Examples:</p>
+            {EXAMPLE_PROMPTS.map((prompt) => (
+              <p key={prompt} className="text-sm text-muted-foreground" onClick={() => setInputValue(prompt)}>{prompt}</p>
+            ))}
+          </div>
+        </form>
+      </div>
+      {response != null ? (
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-2/4">
           <div className="flex flex-col space-y-1.5 p-6">
-            <h3 className="text-lg font-semibold leading-none tracking-tight">Explore Lens</h3>
-            <p className="text-sm text-muted-foreground">Find people that match your interest the most!</p>
+            <h3 className="text-lg font-semibold leading-none tracking-tight">Recommendation</h3>
+            <p className="text-sm text-muted-foreground">We have a perfect match for you!</p>
           </div>
-          <form onSubmit={handleSubmit} className='p-6 flex flex-col gap-4 pt-0'>
-            <div className="flex flex-row gap-4">
-              <Input
-                placeholder="Looking to know..."
-                value={inputValue}
-                onChange={(event) => setInputValue(event.target.value)}
-                name='query'
-              />
-              <Button size="lg" className='gap-2 flex flex-row' disabled={isLoading}>
-                {isLoading && <LucideLoader size={24} className="animate-spin" />}
-                Explore
-              </Button>
-            </div>
-            <div className='flex flex-col gap-2'>
-              <p className="text-sm">Examples:</p>
-              {EXAMPLE_PROMPTS.map((prompt) => (
-                <p key={prompt} className="text-sm text-muted-foreground" onClick={() => setInputValue(prompt)}>{prompt}</p>
-              ))}
-            </div>
-          </form>
+          <div className="flex flex-row gap-4 p-6 pt-0">
+            <p className="text-sm">{response}</p>
+          </div>
         </div>
-        {response != null ? (
-          <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-2/4">
-            <div className="flex flex-col space-y-1.5 p-6">
-              <h3 className="text-lg font-semibold leading-none tracking-tight">Recommendation</h3>
-              <p className="text-sm text-muted-foreground">We have a perfect match for you!</p>
-            </div>
-            <div className="flex flex-row gap-4 p-6 pt-0">
-              <p className="text-sm">{response}</p>
-            </div>
-          </div>
-        ) : null}
-      </div>
-      <footer className="flex flex-row justify-center items-center h-24 w-full">
-        <a href="https://twitter.com/3loop_io" target="_blank" className="text-sm">Made with ❤️ by 3loop Team</a>
-      </footer>
-    </main >
+      ) : null}
+    </div>
   )
 }

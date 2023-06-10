@@ -33,3 +33,14 @@ query Profiles($request: ProfileQueryRequest!) {
   }
 }
 `
+
+export type Profile = {
+  profile: {
+    id: string,
+    ownedBy: string,
+    name: string,
+    followNftAddress: string
+    bio: string,
+    stats: Record<string, number>,
+  }
+}
