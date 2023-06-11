@@ -33,7 +33,7 @@ const systemMessageTemplate = (profile: Profile, posts: Posts, memecoins: boolea
             Besides, Here are some requirements:
             1. Detect patterns in the user's query and response with the most relevant interests.
             2. Here is the JSON containing user profile: ${JSON.stringify(profile.profile)}
-            3. Do not include their profile stats in the response.
+            3. Use an minified format that you will be able to parse later 
             4. ${memecoins ? 'User is a meme coin holder (degen)' : 'User is not a meme holder'}
             5. Here is a JSON containing a list of posts from a user separated by "|":
             ${JSON.stringify(messages).substring(0, 10000)}
@@ -82,12 +82,12 @@ export async function processHandle(handle: string, attendee?: boolean, long?: b
     long ?
       {
         role: "user",
-        content: "Give a breif description of user profile, and list their interests"
+        content: "Give a breif description of user profile, and list their interests. Do not include their profile stats in the response."
       }
       :
       {
         role: "user",
-        content: "In one phrase give a description in up to 10 words of the user, and a list of their interests. Keep it under 50 tokens"
+        content: "In one phrase give a description in up to 10 words of the user. Also generate a comprehensive list of their interests. Keep it under 80 tokens"
       },
   ];
 

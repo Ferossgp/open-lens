@@ -8,8 +8,6 @@ export const config = {
 export default async function handler(req: NextRequest) {
   const { rows: users } = await sql`SELECT handle from users where attendee = true;`;
 
-  console.log(`Processing top ${users.length} users on Lens`)
-
   return new Response(
     JSON.stringify({
       users: users.map((user) => ({

@@ -19,6 +19,7 @@ const systemMessageTemplate = (users: UserResponse[]): IMessage => {
       .replaceAll(/((\d+) comm)\w+/g, '')
       .replaceAll(/((\d+) mirr)\w+/g, '')
       .replaceAll('#', '')
+      .replaceAll('\n', '')
       .split(' ')
 
     const interm = words.length > 30 ? words.slice(0, 30).join(' ') : words.join(' ')
@@ -67,7 +68,7 @@ export default async function handler(req: NextRequest) {
 
   console.log('Processing user query:', query)
   // Select random users
-  const { rows: users } = await sql`SELECT * from users order by random() limit ${MAX}`;
+  const { rows: users } = await sql`SELECT * from users where description is not null order by random() limit ${MAX}`;
 
   console.log(`Processing top ${users.length} users on Lens`)
 
